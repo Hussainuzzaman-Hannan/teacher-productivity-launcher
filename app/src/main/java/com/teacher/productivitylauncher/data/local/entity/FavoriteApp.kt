@@ -8,5 +8,6 @@ data class FavoriteApp(
     @PrimaryKey
     val packageName: String,
     val appName: String,
-    val addedDate: Long = System.currentTimeMillis()
+    val addedDate: Long = System.currentTimeMillis(),
+    val sortOrder: Int = 0   // rearrange এর জন্য
 )

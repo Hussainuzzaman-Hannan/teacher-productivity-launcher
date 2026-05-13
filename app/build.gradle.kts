@@ -21,7 +21,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true  // 🔥 পরিবর্তন: false থেকে true করা হয়েছে (পারফরম্যান্সের জন্য)
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -40,7 +40,7 @@ android {
 
     buildFeatures {
         compose = true
-        buildConfig = true  // Added for BackupManager BuildConfig
+        buildConfig = true
     }
 
     composeOptions {
@@ -66,6 +66,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-compiler:2.48")
@@ -76,28 +77,29 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
 
-    // Lifecycle Runtime Compose for collectAsStateWithLifecycle
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
 
-    // PDF to Image / Image to PDF - REMOVED (not working)
-    // implementation("com.github.barteksc:android-pdf-viewer:2.8.2")
-    // implementation("com.itextpdf:itext7-core:7.2.5")
-
-    // Image Processing
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
-    // Camera & OCR
+    // ML Kit — English/Latin OCR
     implementation("com.google.mlkit:text-recognition:16.0.0")
     implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
+
+    // Tesseract — Bengali OCR
+    implementation("cz.adaptech.tesseract4android:tesseract4android:4.7.0")
+
     implementation("androidx.camera:camera-camera2:1.3.0")
     implementation("androidx.camera:camera-lifecycle:1.3.0")
     implementation("androidx.camera:camera-view:1.3.0")
 
-// Image Processing
-    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.0")
 
-    // File Picker - REMOVED (not working, using default gallery picker instead)
-    // implementation("com.github.dhaval2404:imagepicker:2.1")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.code.gson:gson:2.10.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

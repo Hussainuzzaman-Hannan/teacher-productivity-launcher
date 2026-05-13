@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ClassRoutineDao {
+
     @Query("SELECT * FROM class_routine WHERE dayOfWeek = :day ORDER BY startTime ASC")
     fun getRoutineByDay(day: Int): Flow<List<ClassRoutine>>
 
@@ -16,7 +17,7 @@ interface ClassRoutineDao {
     fun getRoutineByDayAndClass(day: Int, className: String): Flow<List<ClassRoutine>>
 
     @Insert
-    suspend fun insertRoutine(routine: ClassRoutine)
+    suspend fun insertRoutine(routine: ClassRoutine): Long
 
     @Update
     suspend fun updateRoutine(routine: ClassRoutine)
@@ -29,4 +30,12 @@ interface ClassRoutineDao {
 
     @Query("SELECT DISTINCT className FROM class_routine")
     suspend fun getDistinctClasses(): List<String>
+
+    // 🔥 সব ক্লাস রুটিন পাওয়ার জন্য নতুন ফাংশন (রিমাইন্ডারের জন্য প্রয়োজন)
+    @Query("SELECT * FROM class_routine")
+    fun getAllRoutinesFlow(): Flow<List<ClassRoutine>>
+
+    // 🔥 Suspend version for reminder manager
+    @Query("SELECT * FROM class_routine")
+    suspend fun getAllRoutines(): List<ClassRoutine>
 }

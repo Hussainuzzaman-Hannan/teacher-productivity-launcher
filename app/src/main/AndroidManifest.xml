@@ -2,34 +2,40 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Launcher permissions -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
-    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
     <uses-permission android:name="android.permission.REAL_GET_TASKS" />
-
-    <!-- Required for Black Screen/Lock Workaround (Fingerprint Support) -->
     <uses-permission android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="WriteSettings" />
-
-    <!-- Camera & Storage Permissions for Teaching Tools -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
 
-    <!-- Required for Android 11+ to detect installed apps -->
     <queries>
         <intent>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.DELETE" />
+            <data android:scheme="package" />
         </intent>
     </queries>
 
@@ -42,9 +48,9 @@
         android:supportsRtl="true"
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true"
+        android:enableOnBackInvokedCallback="true"
         android:theme="@style/Theme.TeacherProductivityLauncher">
 
-        <!-- Main Launcher Activity with Splash Theme -->
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"
@@ -59,7 +65,11 @@
             </intent-filter>
         </activity>
 
-        <!-- Device Admin Receiver (Screen Lock) -->
+        <activity
+            android:name=".presentation.UninstallActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
         <receiver
             android:name=".presentation.receiver.AdminReceiver"
             android:exported="true"
@@ -72,7 +82,21 @@
             </intent-filter>
         </receiver>
 
-        <!-- File Provider for Teaching Tools (PDF/Image sharing) -->
+        <!-- Class Reminder Receiver — exported true লাগবে alarm trigger করতে -->
+        <receiver
+            android:name=".presentation.launcher.ClassReminderReceiver"
+            android:exported="true" />
+
+        <!-- Boot receiver — ফোন restart হলে alarm আবার schedule করবে -->
+        <receiver
+            android:name=".presentation.launcher.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

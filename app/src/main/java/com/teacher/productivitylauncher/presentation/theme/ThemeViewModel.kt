@@ -12,9 +12,15 @@ import kotlinx.coroutines.launch
 class ThemeViewModel(application: Application) : AndroidViewModel(application) {
     private val settingsDataStore = SettingsDataStore(application)
 
-    private val _isDarkMode = MutableStateFlow(false)
-    val isDarkMode: StateFlow<Boolean> = _isDarkMode.asStateFlow()
+    // ── AppTheme state ───────────────────────────────────────
+    private val _appTheme = MutableStateFlow(AppTheme.DARK)
+    val appTheme: StateFlow<AppTheme> = _appTheme.asStateFlow()
 
+    // ── backward compat — MainActivity এ লাগলে ──────────────
+    val isDarkMode: StateFlow<Boolean>
+        get() = MutableStateFlow(_appTheme.value != AppTheme.LIGHT).asStateFlow()
+
+    // ── Notifications ────────────────────────────────────────
     private val _areNotificationsEnabled = MutableStateFlow(true)
     val areNotificationsEnabled: StateFlow<Boolean> = _areNotificationsEnabled.asStateFlow()
 
@@ -25,8 +31,8 @@ class ThemeViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun loadThemePreference() {
         viewModelScope.launch {
-            settingsDataStore.isDarkModeEnabled.collect { isDark ->
-                _isDarkMode.value = isDark
+            settingsDataStore.appTheme.collect { theme ->
+                _appTheme.value = theme
             }
         }
     }
@@ -39,21 +45,24 @@ class ThemeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun toggleDarkMode() {
+    // ── Theme setters ────────────────────────────────────────
+    fun setAppTheme(theme: AppTheme) {
         viewModelScope.launch {
-            val newValue = !_isDarkMode.value
-            settingsDataStore.setDarkModeEnabled(newValue)
-            _isDarkMode.value = newValue
+            settingsDataStore.setAppTheme(theme)
+            _appTheme.value = theme
         }
+    }
+
+    fun toggleDarkMode() {
+        val next = if (_appTheme.value == AppTheme.LIGHT) AppTheme.DARK else AppTheme.LIGHT
+        setAppTheme(next)
     }
 
     fun setDarkMode(enabled: Boolean) {
-        viewModelScope.launch {
-            settingsDataStore.setDarkModeEnabled(enabled)
-            _isDarkMode.value = enabled
-        }
+        setAppTheme(if (enabled) AppTheme.DARK else AppTheme.LIGHT)
     }
 
+    // ── Notification setters ─────────────────────────────────
     fun toggleNotifications() {
         viewModelScope.launch {
             val newValue = !_areNotificationsEnabled.value

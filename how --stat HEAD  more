@@ -1,0 +1,142 @@
+[33mcommit b430119a878dec614cec2309e6acdfd0fd0c3856[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: 113no. kandapara <113dkgpschool@gmail.com>
+Date:   Sat May 2 00:47:53 2026 +0600
+
+    Initial commit
+
+ .gitignore                                         |  15 [32m+[m
+ .idea/.gitignore                                   |   3 [32m+[m
+ .idea/.name                                        |   1 [32m+[m
+ .idea/AndroidProjectSystem.xml                     |   6 [32m+[m
+ .idea/compiler.xml                                 |   6 [32m+[m
+ .idea/deploymentTargetSelector.xml                 |  10 [32m+[m
+ .idea/gradle.xml                                   |  19 [32m+[m
+ .idea/inspectionProfiles/Project_Default.xml       |  61 [32m++[m
+ .idea/migrations.xml                               |  10 [32m+[m
+ .idea/misc.xml                                     |   9 [32m+[m
+ .idea/runConfigurations.xml                        |  17 [32m+[m
+ .idea/vcs.xml                                      |   6 [32m+[m
+ app/.gitignore                                     |   1 [32m+[m
+ app/build.gradle.kts                               | 113 [32m+++[m
+ app/proguard-rules.pro                             |  21 [32m+[m
+ .../ExampleInstrumentedTest.kt                     |  24 [32m+[m
+ app/src/main/AndroidManifest.xml                   |  88 [32m++[m
+ app/src/main/ic_launcher-playstore.png             | Bin [31m0[m -> [32m50444[m bytes
+ .../TeacherLauncherApplication.kt                  |  12 [32m+[m
+ .../productivitylauncher/data/local/AppInfo.kt     |  10 [32m+[m
+ .../data/local/AppRepository.kt                    |  96 [32m++[m
+ .../data/local/BackupManager.kt                    | 297 [32m+++++++[m
+ .../data/local/SettingsDataStore.kt                |  42 [32m+[m
+ .../data/local/dao/AppFolderDao.kt                 |  23 [32m+[m
+ .../data/local/dao/AttendanceDao.kt                |  40 [32m+[m
+ .../data/local/dao/BlockedAppDao.kt                |  23 [32m+[m
+ .../data/local/dao/ClassRoutineDao.kt              |  32 [32m+[m
+ .../productivitylauncher/data/local/dao/ExamDao.kt |  28 [32m+[m
+ .../data/local/dao/FavoriteAppDao.kt               |  23 [32m+[m
+ .../productivitylauncher/data/local/dao/FeesDao.kt |  57 [32m++[m
+ .../data/local/dao/HiddenAppDao.kt                 |  23 [32m+[m
+ .../productivitylauncher/data/local/dao/NoteDao.kt |  31 [32m+[m
+ .../data/local/dao/RenamedAppDao.kt                |  23 [32m+[m
+ .../data/local/dao/StudentDao.kt                   |  29 [32m+[m
+ .../data/local/database/TeacherDatabase.kt         |  62 [32m++[m
+ .../data/local/entity/AppFolder.kt                 |  13 [32m+[m
+ .../data/local/entity/Attendance.kt                |  16 [32m+[m
+ .../data/local/entity/BlockedApp.kt                |  12 [32m+[m
+ .../data/local/entity/ClassRoutine.kt              |  19 [32m+[m
+ .../productivitylauncher/data/local/entity/Exam.kt |  15 [32m+[m
+ .../data/local/entity/FavoriteApp.kt               |  12 [32m+[m
+ .../data/local/entity/FeesRecord.kt                |  33 [32m+[m
+ .../data/local/entity/HiddenApp.kt                 |  12 [32m+[m
+ .../productivitylauncher/data/local/entity/Note.kt |  15 [32m+[m
+ .../data/local/entity/RenamedApp.kt                |  12 [32m+[m
+ .../data/local/entity/Student.kt                   |  20 [32m+[m
+ .../data/local/repository/AttendanceRepository.kt  |  28 [32m+[m
+ .../local/repository/ClassRoutineRepository.kt     |  35 [32m+[m
+ .../data/local/repository/ExamRepository.kt        |  19 [32m+[m
+ .../local/repository/FavoriteAppsRepository.kt     |  22 [32m+[m
+ .../data/local/repository/FeesRepository.kt        |  41 [32m+[m
+ .../data/local/repository/NoteRepository.kt        |  18 [32m+[m
+ .../data/local/repository/StudentRepository.kt     |  24 [32m+[m
+ .../data/local/util/DateConverter.kt               |  16 [32m+[m
+ .../presentation/AppsActivity.kt                   |  32 [32m+[m
+ .../presentation/MainActivity.kt                   |  83 [32m++[m
+ .../presentation/appdrawer/AppsDrawerScreen.kt     | 381 [32m++++++++[m
+ .../presentation/appdrawer/AppsDrawerViewModel.kt  | 106 [32m+++[m
+ .../presentation/attendance/AttendanceScreen.kt    | 390 [32m+++++++++[m
+ .../presentation/attendance/AttendanceViewModel.kt | 174 [32m++++[m
+ .../presentation/classroutine/AddClassScreen.kt    | 147 [32m++++[m
+ .../classroutine/ClassRoutineScreen.kt             | 632 [32m++++++++++++++[m
+ .../classroutine/ClassRoutineViewModel.kt          | 181 [32m++++[m
+ .../presentation/communication/ContactScreen.kt    |   4 [32m+[m
+ .../presentation/communication/DialerScreen.kt     | 128 [32m+++[m
+ .../presentation/communication/MessageScreen.kt    | 136 [32m+++[m
+ .../presentation/communication/WhatsAppScreen.kt   | 124 [32m+++[m
+ .../presentation/exams/ExamsScreen.kt              | 328 [32m+++++++[m
+ .../presentation/exams/ExamsViewModel.kt           | 100 [32m+++[m
+ .../presentation/favorite/FavoriteAppsViewModel.kt |  68 [32m++[m
+ .../presentation/feestracker/FeesTrackerScreen.kt  | 439 [32m++++++++++[m
+ .../presentation/feestracker/FeesViewModel.kt      | 206 [32m+++++[m
+ .../presentation/launcher/ClockViewModel.kt        |  41 [32m+[m
+ .../presentation/launcher/HomeViewModel.kt         | 128 [32m+++[m
+ .../presentation/launcher/HomeViewModelFactory.kt  |  15 [32m+[m
+ .../presentation/launcher/LauncherScreen.kt        | 966 [32m+++++++++++++++++++++[m
+ .../presentation/notes/NotesScreen.kt              | 265 [32m++++++[m
+ .../presentation/notes/NotesViewModel.kt           |  99 [32m+++[m
+ .../questionmaker/QuestionMakerScreen.kt           | 102 [32m+++[m
+ .../presentation/receiver/AdminReceiver.kt         |  19 [32m+[m
+ .../presentation/search/SmartSearchScreen.kt       |  71 [32m++[m
+ .../presentation/settings/SettingsScreen.kt        | 308 [32m+++++++[m
+ .../presentation/students/StudentViewModel.kt      |  85 [32m++[m
+ .../students/StudentsManagementScreen.kt           | 288 [32m++++++[m
+ .../presentation/students/StudentsPanelScreen.kt   |  70 [32m++[m
+ .../presentation/theme/Color.kt                    |  27 [32m+[m
+ .../presentation/theme/Theme.kt                    |  45 [32m+[m
+ .../presentation/theme/ThemeViewModel.kt           |  71 [32m++[m
+ .../presentation/tools/TeachingToolsScreen.kt      | 473 [32m++++++++++[m
+ .../presentation/utils/FileUtils.kt                |  38 [32m+[m
+ .../presentation/utils/LockScreenUtils.kt          | 103 [32m+++[m
+ .../presentation/utils/NotificationHelper.kt       | 102 [32m+++[m
+ .../presentation/utils/PdfUtils.kt                 |  58 [32m++[m
+ .../teacher/productivitylauncher/ui/theme/Color.kt |  11 [32m+[m
+ .../teacher/productivitylauncher/ui/theme/Theme.kt |  58 [32m++[m
+ .../teacher/productivitylauncher/ui/theme/Type.kt  |  34 [32m+[m
+ .../main/res/drawable/ic_launcher_background.xml   | 170 [32m++++[m
+ .../main/res/drawable/ic_launcher_foreground.xml   |  30 [32m+[m
+ app/src/main/res/drawable/splash_background.xml    |  14 [32m+[m
+ .../main/res/drawable/splash_background_dark.xml   |  14 [32m+[m
+ app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml |   5 [32m+[m
+ .../res/mipmap-anydpi-v26/ic_launcher_round.xml    |   5 [32m+[m
+ app/src/main/res/mipmap-hdpi/ic_launcher.png       | Bin [31m0[m -> [32m10949[m bytes
+ .../res/mipmap-hdpi/ic_launcher_foreground.png     | Bin [31m0[m -> [32m58725[m bytes
+ app/src/main/res/mipmap-hdpi/ic_launcher_round.png | Bin [31m0[m -> [32m12610[m bytes
+ app/src/main/res/mipmap-mdpi/ic_launcher.png       | Bin [31m0[m -> [32m5469[m bytes
+ .../res/mipmap-mdpi/ic_launcher_foreground.png     | Bin [31m0[m -> [32m28965[m bytes
+ app/src/main/res/mipmap-mdpi/ic_launcher_round.png | Bin [31m0[m -> [32m6140[m bytes
+ app/src/main/res/mipmap-xhdpi/ic_launcher.png      | Bin [31m0[m -> [32m18716[m bytes
+ .../res/mipmap-xhdpi/ic_launcher_foreground.png    | Bin [31m0[m -> [32m67072[m bytes
+ .../main/res/mipmap-xhdpi/ic_launcher_round.png    | Bin [31m0[m -> [32m21513[m bytes
+ app/src/main/res/mipmap-xxhdpi/ic_launcher.png     | Bin [31m0[m -> [32m38687[m bytes
+ .../res/mipmap-xxhdpi/ic_launcher_foreground.png   | Bin [31m0[m -> [32m79969[m bytes
+ .../main/res/mipmap-xxhdpi/ic_launcher_round.png   | Bin [31m0[m -> [32m43952[m bytes
+ app/src/main/res/mipmap-xxxhdpi/ic_launcher.png    | Bin [31m0[m -> [32m53539[m bytes
+ .../res/mipmap-xxxhdpi/ic_launcher_foreground.png  | Bin [31m0[m -> [32m63702[m bytes
+ .../main/res/mipmap-xxxhdpi/ic_launcher_round.png  | Bin [31m0[m -> [32m51955[m bytes
+ app/src/main/res/values-night/themes.xml           |  20 [32m+[m
+ app/src/main/res/values/colors.xml                 |  10 [32m+[m
+ app/src/main/res/values/ic_launcher_background.xml |   4 [32m+[m
+ app/src/main/res/values/strings.xml                |   3 [32m+[m
+ app/src/main/res/values/themes.xml                 |  20 [32m+[m
+ app/src/main/res/xml/backup_rules.xml              |  13 [32m+[m
+ app/src/main/res/xml/data_extraction_rules.xml     |  19 [32m+[m
+ app/src/main/res/xml/device_admin.xml              |  13 [32m+[m
+ app/src/main/res/xml/file_paths.xml                |   6 [32m+[m
+ .../productivitylauncher/ExampleUnitTest.kt        |  17 [32m+[m
+ build.gradle.kts                                   |   8 [32m+[m
+ gradle.properties                                  |  23 [32m+[m
+ gradle/libs.versions.toml                          |  51 [32m++[m
+ gradle/wrapper/gradle-wrapper.jar                  | Bin [31m0[m -> [32m59203[m bytes
+ gradle/wrapper/gradle-wrapper.properties           |   6 [32m+[m
+ gradlew                                            | 185 [32m++++[m
+ gradlew.bat                                        |  89 [32m++[m
+ settings.gradle.kts                                |  24 [32m+[m
+ 135 files changed, 9528 insertions(+)

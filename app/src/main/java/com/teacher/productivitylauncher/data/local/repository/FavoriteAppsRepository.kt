@@ -19,4 +19,10 @@ class FavoriteAppsRepository(private val favoriteAppDao: FavoriteAppDao) {
     suspend fun removeFavorite(packageName: String) {
         favoriteAppDao.removeFavoriteByPackage(packageName)
     }
+
+    suspend fun updateOrder(apps: List<FavoriteApp>) {
+        apps.forEachIndexed { index, app ->
+            favoriteAppDao.updateSortOrder(app.packageName, index)
+        }
+    }
 }

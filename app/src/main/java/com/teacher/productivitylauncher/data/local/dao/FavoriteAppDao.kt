@@ -6,7 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoriteAppDao {
-    @Query("SELECT * FROM favorite_apps ORDER BY addedDate DESC")
+
+    @Query("SELECT * FROM favorite_apps ORDER BY sortOrder ASC, addedDate ASC")
     fun getAllFavorites(): Flow<List<FavoriteApp>>
 
     @Query("SELECT * FROM favorite_apps WHERE packageName = :packageName")
@@ -20,4 +21,7 @@ interface FavoriteAppDao {
 
     @Query("DELETE FROM favorite_apps WHERE packageName = :packageName")
     suspend fun removeFavoriteByPackage(packageName: String)
+
+    @Query("UPDATE favorite_apps SET sortOrder = :sortOrder WHERE packageName = :packageName")
+    suspend fun updateSortOrder(packageName: String, sortOrder: Int)
 }

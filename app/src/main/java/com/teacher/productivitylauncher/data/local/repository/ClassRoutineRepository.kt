@@ -15,8 +15,8 @@ class ClassRoutineRepository(private val classRoutineDao: ClassRoutineDao) {
     fun getRoutineByDayAndClass(day: Int, className: String): Flow<List<ClassRoutine>> =
         classRoutineDao.getRoutineByDayAndClass(day, className)
 
-    suspend fun insertRoutine(routine: ClassRoutine) {
-        classRoutineDao.insertRoutine(routine)
+    suspend fun insertRoutine(routine: ClassRoutine): Long {
+        return classRoutineDao.insertRoutine(routine)
     }
 
     suspend fun updateRoutine(routine: ClassRoutine) {

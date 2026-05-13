@@ -2,6 +2,7 @@ package com.teacher.productivitylauncher.presentation.favorite
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.teacher.productivitylauncher.data.local.database.TeacherDatabase
 import com.teacher.productivitylauncher.data.local.entity.FavoriteApp
@@ -42,27 +43,43 @@ class FavoriteAppsViewModel(application: Application) : AndroidViewModel(applica
     }
 
     suspend fun addToFavorites(packageName: String, appName: String): Boolean {
-        val currentSize = _favoriteApps.value.size
-        if (currentSize >= MAX_FAVORITES) {
+        val currentList = _favoriteApps.value
+        if (currentList.size >= MAX_FAVORITES) {
             _maxLimitReached.value = true
             return false
         }
-
         val favorite = FavoriteApp(
             packageName = packageName,
-            appName = appName
+            appName = appName,
+            sortOrder = currentList.size
         )
         repository.addFavorite(favorite)
-        loadFavorites()
         return true
     }
 
     suspend fun removeFromFavorites(packageName: String) {
         repository.removeFavorite(packageName)
-        loadFavorites()
     }
 
     suspend fun isFavorite(packageName: String): Boolean {
         return repository.isFavorite(packageName)
+    }
+
+    // Drag & drop এ নতুন order save করে
+    fun reorder(newList: List<FavoriteApp>) {
+        _favoriteApps.value = newList
+        viewModelScope.launch {
+            repository.updateOrder(newList)
+        }
+    }
+}
+
+class FavoriteAppsViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
+    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(FavoriteAppsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return FavoriteAppsViewModel(application) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

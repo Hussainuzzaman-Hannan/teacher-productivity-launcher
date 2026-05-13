@@ -21,6 +21,10 @@ class ClockViewModel : ViewModel() {
     private val _dateFormat = MutableStateFlow(SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault()))
     val dateFormat: StateFlow<SimpleDateFormat> = _dateFormat.asStateFlow()
 
+    // Clock style: 0 = Minimal Digital, 1 = Large Digital with Seconds, 2 = Analog, 3 = Gradient Digital, 4 = Split Neon
+    private val _clockStyle = MutableStateFlow(0)
+    val clockStyle: StateFlow<Int> = _clockStyle.asStateFlow()
+
     init {
         startClock()
     }
@@ -29,9 +33,21 @@ class ClockViewModel : ViewModel() {
         viewModelScope.launch {
             while (true) {
                 _currentTime.value = Calendar.getInstance().time
-                delay(1000) // প্রতি 1 সেকেন্ডে আপডেট
+                delay(1000)
             }
         }
+    }
+
+    fun nextClockStyle() {
+        _clockStyle.value = (_clockStyle.value + 1) % 5
+    }
+
+    fun previousClockStyle() {
+        _clockStyle.value = if (_clockStyle.value == 0) 4 else _clockStyle.value - 1
+    }
+
+    fun setClockStyle(style: Int) {
+        _clockStyle.value = style.coerceIn(0, 4)
     }
 
     fun updateLocale() {

@@ -24,7 +24,7 @@ import com.teacher.productivitylauncher.data.local.util.DateConverter
         AppFolder::class,
         RenamedApp::class
     ],
-    version = 4,  // Version increased for renamed apps feature
+    version = 5,  // Version increased for renamed apps feature
     exportSchema = false
 )
 @TypeConverters(DateConverter::class)

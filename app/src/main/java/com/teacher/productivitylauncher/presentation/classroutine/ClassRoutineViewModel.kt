@@ -1,21 +1,14 @@
 package com.teacher.productivitylauncher.presentation.classroutine
 
 import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.os.Build
-import androidx.core.app.NotificationCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.teacher.productivitylauncher.data.local.SettingsDataStore
 import com.teacher.productivitylauncher.data.local.database.TeacherDatabase
 import com.teacher.productivitylauncher.data.local.entity.ClassRoutine
 import com.teacher.productivitylauncher.data.local.repository.ClassRoutineRepository
-import com.teacher.productivitylauncher.presentation.MainActivity
-import com.teacher.productivitylauncher.presentation.utils.NotificationHelper
+import com.teacher.productivitylauncher.presentation.launcher.ClassReminderManager
+import com.teacher.productivitylauncher.presentation.launcher.ClassReminderService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,6 +20,7 @@ class ClassRoutineViewModel(application: Application) : AndroidViewModel(applica
         TeacherDatabase.getDatabase(application).classRoutineDao()
     )
     private val settingsDataStore = SettingsDataStore(application)
+    private val reminderManager = ClassReminderManager(application)
     private var areNotificationsEnabled = true
 
     private val _routines = MutableStateFlow<List<ClassRoutine>>(emptyList())
@@ -48,6 +42,8 @@ class ClassRoutineViewModel(application: Application) : AndroidViewModel(applica
         loadAvailableClasses()
         loadTodayRoutines()
         loadNotificationPreference()
+        // Notification channel তৈরি করো
+        ClassReminderService.createNotificationChannel(application)
     }
 
     private fun loadNotificationPreference() {
@@ -100,8 +96,15 @@ class ClassRoutineViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    fun addRoutine(subjectName: String, className: String, teacherName: String,
-                   dayOfWeek: Int, startTime: String, endTime: String, roomNumber: String) {
+    fun addRoutine(
+        subjectName: String,
+        className: String,
+        teacherName: String,
+        dayOfWeek: Int,
+        startTime: String,
+        endTime: String,
+        roomNumber: String
+    ) {
         viewModelScope.launch {
             val routine = ClassRoutine(
                 subjectName = subjectName,
@@ -113,14 +116,17 @@ class ClassRoutineViewModel(application: Application) : AndroidViewModel(applica
                 roomNumber = roomNumber,
                 notificationEnabled = true
             )
-            repository.insertRoutine(routine)
+            // insert করে নতুন id পাও
+            val insertedId = repository.insertRoutine(routine)
+            val routineWithId = routine.copy(id = insertedId.toInt())
+
             _message.value = "Class added successfully"
             loadAvailableClasses()
             loadTodayRoutines()
             clearMessageAfterDelay()
 
-            // Schedule notification for this class
-            scheduleClassNotification(routine)
+            // সঠিক id দিয়ে alarm schedule করো
+            scheduleAlarm(routineWithId)
         }
     }
 
@@ -130,11 +136,21 @@ class ClassRoutineViewModel(application: Application) : AndroidViewModel(applica
             _message.value = "Class updated successfully"
             loadTodayRoutines()
             clearMessageAfterDelay()
+
+            // পুরনো alarm cancel করে নতুন করে schedule করো
+            if (routine.notificationEnabled && areNotificationsEnabled) {
+                scheduleAlarm(routine)
+            } else {
+                reminderManager.cancelRoutineReminder(routine.id)
+            }
         }
     }
 
     fun deleteRoutine(routine: ClassRoutine) {
         viewModelScope.launch {
+            // আগে alarm cancel করো
+            reminderManager.cancelRoutineReminder(routine.id)
+
             repository.deleteRoutine(routine)
             _message.value = "Class deleted successfully"
             loadAvailableClasses()
@@ -152,19 +168,36 @@ class ClassRoutineViewModel(application: Application) : AndroidViewModel(applica
             repository.updateRoutine(updated)
             _message.value = if (updated.notificationEnabled) "Notifications enabled" else "Notifications disabled"
             clearMessageAfterDelay()
+
+            // Toggle অনুযায়ী alarm schedule বা cancel করো
+            if (updated.notificationEnabled && areNotificationsEnabled) {
+                scheduleAlarm(updated)
+            } else {
+                reminderManager.cancelRoutineReminder(updated.id)
+            }
         }
     }
 
-    private fun scheduleClassNotification(routine: ClassRoutine) {
-        if (!routine.notificationEnabled || !areNotificationsEnabled) return
-
+    private fun scheduleAlarm(routine: ClassRoutine) {
+        if (!areNotificationsEnabled) return
         val context = getApplication<Application>()
-        val notificationHelper = NotificationHelper(context)
-        notificationHelper.createNotificationChannels()
-        notificationHelper.showClassNotification(
-            routine.subjectName,
-            routine.startTime,
-            routine.roomNumber
+        val calendarDay = when (routine.dayOfWeek) {
+            1 -> Calendar.MONDAY
+            2 -> Calendar.TUESDAY
+            3 -> Calendar.WEDNESDAY
+            4 -> Calendar.THURSDAY
+            5 -> Calendar.FRIDAY
+            6 -> Calendar.SATURDAY
+            7 -> Calendar.SUNDAY
+            else -> Calendar.MONDAY
+        }
+        ClassReminderService.scheduleClassReminders(
+            context = context,
+            routineId = routine.id,
+            subjectName = routine.subjectName,
+            startTime = routine.startTime,
+            endTime = routine.endTime,
+            dayOfWeek = calendarDay
         )
     }
 
