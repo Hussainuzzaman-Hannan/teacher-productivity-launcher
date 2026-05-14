@@ -101,10 +101,10 @@ fun AppsDrawerScreen(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                // Header with Close Button
+                // Header with Title Only (Close and Refresh buttons removed)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -113,20 +113,6 @@ fun AppsDrawerScreen(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
-                    Row {
-                        // Refresh button
-                        IconButton(onClick = { viewModel.refreshApps() }) {
-                            Icon(
-                                Icons.Default.Refresh,
-                                contentDescription = "Refresh",
-                                tint = if (isRefreshing) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                        IconButton(onClick = onClose) {
-                            Icon(Icons.Default.Close, contentDescription = "Close")
-                        }
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))

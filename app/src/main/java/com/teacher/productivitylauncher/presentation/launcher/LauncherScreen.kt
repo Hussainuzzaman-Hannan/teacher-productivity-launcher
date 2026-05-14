@@ -52,7 +52,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -75,7 +74,6 @@ import com.teacher.productivitylauncher.presentation.settings.SettingsScreen
 import com.teacher.productivitylauncher.presentation.settings.HomeScreenSettings
 import com.teacher.productivitylauncher.presentation.tools.TeachingToolsScreen
 import com.teacher.productivitylauncher.presentation.widgets.WidgetScreen
-import com.teacher.productivitylauncher.presentation.widgets.WidgetConfig
 import com.teacher.productivitylauncher.presentation.widgets.WidgetType
 import com.teacher.productivitylauncher.presentation.widgets.WidgetViewModel
 import com.teacher.productivitylauncher.presentation.widgets.ClassRoutineWidgetContent
@@ -117,7 +115,8 @@ fun LauncherScreen() {
     var currentPage by remember { mutableStateOf(0) }
     var showAppsDrawer by remember { mutableStateOf(false) }
 
-    var showTeachingTools by remember { mutableStateOf(false) }
+    // 🔥 পরিবর্তন: showTeachingTools বাদ দিয়ে showDetailedTools
+    var showDetailedTools by remember { mutableStateOf(false) }
     var showClassRoutine by remember { mutableStateOf(false) }
     var showQuestionMaker by remember { mutableStateOf(false) }
     var showNotes by remember { mutableStateOf(false) }
@@ -192,7 +191,7 @@ fun LauncherScreen() {
             )
             1 -> LeftPanelScreen(
                 onBack = { currentPage = 0 },
-                onShowTools = { showTeachingTools = true }
+                onShowTools = { showDetailedTools = true }  // 🔥 পরিবর্তন: সরাসরি ডিটেইলড টুলস
             )
             2 -> RightPanelScreen(
                 onBack = { currentPage = 0 },
@@ -205,8 +204,15 @@ fun LauncherScreen() {
         if (showAppsDrawer) {
             AppsDrawerScreen(onClose = { showAppsDrawer = false })
         }
-        if (showTeachingTools) {
-            TeachingToolsScreen(onClose = { showTeachingTools = false })
+        // 🔥 নতুন: ডিটেইলড টিচিং টুলস স্ক্রিন
+        if (showDetailedTools) {
+            TeachingToolsScreen(
+                onClose = { showDetailedTools = false },
+                onClassRoutineClick = { showClassRoutine = true },
+                onNotesClick = { showNotes = true },
+                onExamsClick = { showExams = true },
+                onQuestionMakerClick = { showQuestionMaker = true }
+            )
         }
         if (showClassRoutine) {
             ClassRoutineScreen(onClose = { showClassRoutine = false })
@@ -345,7 +351,7 @@ fun MinimalHomeScreen(
             )
         }
 
-        // Blur overlay - Using Box with background (Canvas error fixed)
+        // Blur overlay
         if (blurAmount > 0) {
             Box(
                 modifier = Modifier
@@ -354,7 +360,7 @@ fun MinimalHomeScreen(
             )
         }
 
-        // Dark overlay - Using Box with background (Canvas error fixed)
+        // Dark overlay
         if (darkOverlay > 0) {
             Box(
                 modifier = Modifier
@@ -1176,7 +1182,7 @@ fun rememberDrawablePainter(drawable: Drawable): Painter {
                 drawable.intrinsicHeight.coerceAtLeast(1),
                 android.graphics.Bitmap.Config.ARGB_8888
             )
-            val canvas = android.graphics.Canvas(bmp)  // ← Full path ব্যবহার করুন
+            val canvas = android.graphics.Canvas(bmp)
             drawable.setBounds(0, 0, canvas.width, canvas.height)
             drawable.draw(canvas)
             bmp
@@ -1191,18 +1197,11 @@ fun LeftPanelScreen(
     onBack: () -> Unit,
     onShowTools: () -> Unit
 ) {
-    var showToolsPanel by remember { mutableStateOf(false) }
-
-    // When back button is pressed, close the drawer
-    LaunchedEffect(Unit) {
-        showToolsPanel = true
-    }
-
     ModalNavigationDrawer(
         drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
         drawerContent = {
             ModalDrawerSheet(
-                modifier = Modifier.fillMaxSize(),  // 🔥 Full screen
+                modifier = Modifier.fillMaxSize(),
                 drawerContainerColor = MaterialTheme.colorScheme.background
             ) {
                 // Header
@@ -1226,86 +1225,58 @@ fun LeftPanelScreen(
 
                 HorizontalDivider()
 
-                // Tools content
+                // 🔥 পরিবর্তন: একটি মাত্র বাটন - সরাসরি ডিটেইলড টুলসে যাবে
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Question Maker
-                    TeachingToolItem(
-                        icon = Icons.Default.Edit,
-                        title = "Question Maker",
-                        description = "Create exam questions",
-                        onClick = onShowTools
-                    )
-
-                    // Exams
-                    TeachingToolItem(
-                        icon = Icons.Default.DateRange,
-                        title = "Exams",
-                        description = "Manage exams",
-                        onClick = { /* Navigate */ }
-                    )
-
-                    // Class Routine
-                    TeachingToolItem(
-                        icon = Icons.Default.Schedule,
-                        title = "Class Routine",
-                        description = "View class schedule",
-                        onClick = { /* Navigate */ }
-                    )
-
-                    // Notes
-                    TeachingToolItem(
-                        icon = Icons.Default.Note,
-                        title = "Notes",
-                        description = "Quick notes",
-                        onClick = { /* Navigate */ }
-                    )
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onShowTools() },
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                Icons.Default.Build,
+                                contentDescription = "Tools",
+                                modifier = Modifier.size(36.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column {
+                                Text(
+                                    "All Teaching Tools",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    "PDF, OCR, Calculator & More",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                )
+                            }
+                        }
+                    }
                 }
             }
         },
         modifier = Modifier.fillMaxSize()
     ) {
-        // Empty content because drawer is always open
         Box(modifier = Modifier.fillMaxSize())
-    }
-}
-
-@Composable
-fun TeachingToolItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String,
-    description: String,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                icon,
-                contentDescription = title,
-                modifier = Modifier.size(32.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(title, fontSize = 16.sp, fontWeight = FontWeight.Medium)
-                Text(description, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-            }
-        }
     }
 }
 
@@ -1322,10 +1293,8 @@ fun RightPanelScreen(
         factory = HomeViewModelFactory(context.applicationContext as android.app.Application)
     )
 
-    // 🔥 WidgetViewModel for persistent quote index
     val widgetViewModel: WidgetViewModel = viewModel()
 
-    // 🔥 Load saved index from Storage
     val savedIndex = widgetViewModel.quoteIndex.value
     var currentIndex by remember { mutableStateOf(savedIndex) }
     val quotes = lifeTipsQuotes
@@ -1334,10 +1303,9 @@ fun RightPanelScreen(
     val todayClassesCount by homeViewModel.todayClassesCount.collectAsState()
     val isLoading by homeViewModel.isLoading.collectAsState()
 
-    // 🔥 প্রতি 5 সেকেন্ডে পরিবর্তন হবে (30 থেকে 5 করা হয়েছে)
     LaunchedEffect(Unit) {
         while (true) {
-            delay(5000) // 5 seconds delay
+            delay(5000)
             val newIndex = (currentIndex + 1) % quotes.size
             currentIndex = newIndex
             widgetViewModel.updateQuoteIndex(newIndex)
@@ -1368,7 +1336,6 @@ fun RightPanelScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Today's Classes Card
             AnimatedPressCard(
                 onClick = onShowClassRoutine,
                 modifier = Modifier.fillMaxWidth(),
@@ -1466,7 +1433,6 @@ fun RightPanelScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // 🔥 Quote text shows current index (which saved)
                     Text(
                         text = quotes[currentIndex],
                         fontSize = 13.sp,
@@ -1478,7 +1444,6 @@ fun RightPanelScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Progress indicator
                     LinearProgressIndicator(
                         modifier = Modifier
                             .fillMaxWidth()
