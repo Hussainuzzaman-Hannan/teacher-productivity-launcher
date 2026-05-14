@@ -669,9 +669,23 @@ fun TeachingToolsScreen(
         )
     }
 
-    // Calculator Screen
+    // Calculator Screen - Fixed for Dialog nesting issue
     if (showCalculator) {
-        CalculatorScreen(onBack = { showCalculator = false })
+        Dialog(
+            onDismissRequest = { showCalculator = false },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                decorFitsSystemWindows = false
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+                CalculatorScreen(onBack = { showCalculator = false })
+            }
+        }
     }
 }
 
