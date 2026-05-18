@@ -74,7 +74,7 @@ fun AppsDrawerScreen(
 
     val filteredApps by viewModel.filteredApps.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
-    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val isRefreshing by viewModel.isLoading.collectAsState()
 
     var selectedApp by remember { mutableStateOf<AppInfo?>(null) }
     var showMenu by remember { mutableStateOf(false) }
