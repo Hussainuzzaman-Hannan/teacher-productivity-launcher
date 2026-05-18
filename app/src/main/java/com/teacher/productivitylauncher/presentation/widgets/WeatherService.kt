@@ -29,7 +29,7 @@ class WeatherService(private val context: Context) {
     private val client = OkHttpClient()
     // OpenWeatherMap API key — free এ register করে নাও
     // https://openweathermap.org/api
-    private val API_KEY = "YOUR_API_KEY_HERE"
+    private val API_KEY = "6a2360e156bc01b69dc06a118e5c07b1"
 
     suspend fun getWeather(): WeatherData? {
         val location = getCurrentLocation() ?: return null
